@@ -25,57 +25,83 @@
 
 class LinkedList {
   constructor() {
-    this.head = null;
-    this.tail = null;
+    this.head = this.tail = null;
     this.length = 0;
   }
   push(value) {
-    const node = new Node(value);
-    this.length++;
-    if (!this.head) {
+    let node = new Node(value);
+    if (this.length === 0) {
       this.head = node;
     } else {
       this.tail.next = node;
     }
     this.tail = node;
+    this.length++;
   }
   pop() {
-    return this.delete(this.length - 1);
+    if (this.length === 0) return null;
+
+    if (this.head === this.tail) {
+      // Only one node in the list
+      const value = this.head.value;
+      this.head = this.tail = null;
+      this.length--;
+      return value;
+    }
+
+    let current = this.head;
+    while (current.next !== this.tail) {
+      current = current.next;
+    }
+
+    const value = this.tail.value;
+
+    this.tail = current;
+    this.tail.next = null;
+    this.length--;
+
+    return value;
   }
-  _find(index) {
-    if (index >= this.length) return null;
+  get(index) {
+    if (index < 0 || index >= this.length) return null;
+
     let current = this.head;
     for (let i = 0; i < index; i++) {
       current = current.next;
     }
-
-    return current;
-  }
-  get(index) {
-    const node = this._find(index);
-    if (!node) return void 0;
-    return node.value;
+    return current.value;
   }
   delete(index) {
+    if (index < 0 || index >= this.length) return null;
+
     if (index === 0) {
-      const head = this.head;
-      if (head) {
-        this.head = head.next;
-      } else {
-        this.head = null;
+      const value = this.head.value;
+      this.head = this.head.next;
+      this.length--;
+
+      if (this.length === 0) {
         this.tail = null;
       }
-      this.length--;
-      return head.value;
+
+      return value;
     }
 
-    const node = this._find(index - 1);
-    const excise = node.next;
-    if (!excise) return null;
-    node.next = excise.next;
-    if (!node.next) this.tail = node.next;
+    let previous = this.head;
+    for (let i = 0; i < index - 1; i++) {
+      previous = previous.next;
+    }
+
+    const nodeToDelete = previous.next;
+    const value = nodeToDelete.value;
+
+    if (nodeToDelete === this.tail) {
+      this.tail = previous;
+    }
+
+    previous.next = nodeToDelete.next;
+
     this.length--;
-    return excise.value;
+    return value;
   }
 }
 
